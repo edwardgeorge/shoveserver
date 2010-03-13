@@ -34,6 +34,19 @@ tests = [
         ('get testkey\r\n', 'VALUE testkey 0 1\r\n7\r\nEND\r\n'),],
     # increment non-existing key
     [('incr testkey 1\r\n', 'NOT_FOUND\r\n'),],
+    # decrementing...
+    [('set testkey 0 0 1\r\n5\r\n\r', 'STORED\r\n'),
+        ('decr testkey 1\r\n', '4\r\n'),
+        ('get testkey\r\n', 'VALUE testkey 0 1\r\n4\r\nEND\r\n'),],
+    [('set testkey 0 0 1\r\n5\r\n\r', 'STORED\r\n'),
+        ('decr testkey 4\r\n', '1\r\n'),
+        ('get testkey\r\n', 'VALUE testkey 0 1\r\n1\r\nEND\r\n'),],
+    # decrement non-existant key
+    [('decr testkey 1\r\n', 'NOT_FOUND\r\n'),],
+    # decrement a value of zero
+    [('set testkey 0 0 1\r\n0\r\n\r', 'STORED\r\n'),
+        ('decr testkey 1\r\n', '0\r\n'),
+        ('get testkey\r\n', 'VALUE testkey 0 1\r\n0\r\nEND\r\n'),],
 ]
 
 def test_generator():

@@ -105,7 +105,7 @@ class DictStore(object):
             raise exceptions.NotFoundError(key)
         except (TypeError, ValueError), e:
             prev = 0
-        val = self.store[key] = str(prev - value)
+        val = self.store[key] = str(max(prev - value, 0))
         return val
 
     def flush_all(self, file, delay=0):
