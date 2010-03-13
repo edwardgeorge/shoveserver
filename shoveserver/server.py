@@ -110,8 +110,11 @@ if __name__ == '__main__':
     sock = eventlet.listen(('0.0.0.0', 5211))
     store = {}
     def statdump(store):
+        from datetime import datetime
         while 1:
+            print '%s keys: %d' % (datetime.now().isoformat(' '),
+                len(store.keys()))
             eventlet.sleep(10)
     eventlet.spawn(statdump, store)
-    eventlet.serve(sock, make_memcache_server(stores.DictStore(store)))
+    eventlet.serve(sock, MemcacheServer(stores.DictStore(store)))
 
