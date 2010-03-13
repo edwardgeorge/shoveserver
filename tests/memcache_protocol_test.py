@@ -67,6 +67,12 @@ tests = [
     # add when key exists
     [('set testkey 0 0 2\r\nla\r\n', 'STORED\r\n'),
         ('add testkey 0 0 2\r\nla\r\n', 'NOT_STORED\r\n'),],
+    # replacing a value
+    [('set testkey 0 0 2\r\nla\r\n', 'STORED\r\n'),
+        ('replace testkey 0 0 3\r\nfoo\r\n', 'STORED\r\n'),
+        ('get testkey\r\n', 'VALUE testkey 0 3\r\nfoo\r\nEND\r\n'),],
+    # replacing a non-existant value
+    [('replace testkey 0 0 3\r\nfoo\r\n', 'NOT_STORED\r\n'),],
 ]
 
 def test_generator():
