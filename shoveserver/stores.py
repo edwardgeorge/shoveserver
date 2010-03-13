@@ -90,10 +90,10 @@ class DictStore(object):
         try:
             prev = int(self.store[key])
         except KeyError, e:
-            raise NotFoundException(key)
+            raise exceptions.NotFoundError(key)
         except (TypeError, ValueError), e:
             prev = 0
-        val = self.store[key] = prev + value
+        val = self.store[key] = str(prev + value)
         return val
 
     def decr(self, file, key, value):
@@ -102,10 +102,10 @@ class DictStore(object):
         try:
             prev = int(self.store[key])
         except KeyError, e:
-            raise NotFoundException(key)
+            raise exceptions.NotFoundError(key)
         except (TypeError, ValueError), e:
             prev = 0
-        val = self.store[key] = prev - value
+        val = self.store[key] = str(prev - value)
         return val
 
     def flush_all(self, file, delay=0):

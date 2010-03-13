@@ -25,6 +25,15 @@ tests = [
     [('set testkey 0 0 9\r\ntest data\r\n', 'STORED\r\n'),
         ('delete testkey\r\n', 'DELETED\r\n'),
         ('get testkey\r\n', 'END\r\n'),],
+    # incrementing...
+    [('set testkey 0 0 1\r\n5\r\n\r', 'STORED\r\n'),
+        ('incr testkey 1\r\n', '6\r\n'),
+        ('get testkey\r\n', 'VALUE testkey 0 1\r\n6\r\nEND\r\n'),],
+    [('set testkey 0 0 1\r\n3\r\n\r', 'STORED\r\n'),
+        ('incr testkey 4\r\n', '7\r\n'),
+        ('get testkey\r\n', 'VALUE testkey 0 1\r\n7\r\nEND\r\n'),],
+    # increment non-existing key
+    [('incr testkey 1\r\n', 'NOT_FOUND\r\n'),],
 ]
 
 def test_generator():
