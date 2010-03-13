@@ -19,6 +19,12 @@ tests = [
         ('get testkey1 testkey2 testkey3', 'VALUE testkey1 0 6\r\nfoobar\r\n'
                                            'VALUE testkey2 0 6\r\nbarbaz\r\n'
                                            'END\r\n')],
+    # delete a non-existant key
+    [('delete testkey\r\n', 'NOT_FOUND\r\n'),],
+    # delete a key
+    [('set testkey 0 0 9\r\ntest data\r\n', 'STORED\r\n'),
+        ('delete testkey\r\n', 'DELETED\r\n'),
+        ('get testkey\r\n', 'END\r\n'),],
 ]
 
 def test_generator():
