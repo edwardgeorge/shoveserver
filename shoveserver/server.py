@@ -104,10 +104,14 @@ class MemcacheServer(object):
                 ofile.flush()
 
 
+def serve_store(store, sock):
+    if isinstance(sock, tuple):
+        sock = eventlet.listen(sock)
+    eventlet.serve(sock, MemcacheServer(store))
+
 if __name__ == '__main__':
     import eventlet
     from shoveserver import stores
-    sock = eventlet.listen(('0.0.0.0', 5211))
     store = {}
     def statdump(store):
         from datetime import datetime
@@ -116,5 +120,5 @@ if __name__ == '__main__':
                 len(store.keys()))
             eventlet.sleep(10)
     eventlet.spawn(statdump, store)
-    eventlet.serve(sock, MemcacheServer(stores.DictStore(store)))
+    serve_store(stores.DictStore(store), ('0.0.0.0', 11211))
 
