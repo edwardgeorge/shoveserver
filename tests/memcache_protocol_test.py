@@ -62,6 +62,11 @@ tests = [
     # prepend to a non-existant key
     [('prepend testkey 0 0 2\r\nla\r\n', 'STORED\r\n'),
         ('get testkey\r\n', 'VALUE testkey 0 2\r\nla\r\nEND\r\n'),],
+    # succesful add
+    [('add testkey 0 0 2\r\nla\r\n', 'STORED\r\n'),],
+    # add when key exists
+    [('set testkey 0 0 2\r\nla\r\n', 'STORED\r\n'),
+        ('add testkey 0 0 2\r\nla\r\n', 'NOT_STORED\r\n'),],
 ]
 
 def test_generator():
