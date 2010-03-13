@@ -32,14 +32,25 @@ def format_values(values):
 
 SUPPORTED_CMDS = compile(
     (['set', 'replace', 'append', 'prepend', 'add'], r'^(?P<key>\S{1,250}) (?P<flags>\d+) (?P<exptime>\d+) (?P<bytes>\d+)(?: (?P<noreply>noreply))?$', STORED),
-    (['get', 'gets'], r'^(?P<keys>\S{1,250}(?:\s\S{1,250})?)$', format_values),
+    (['get', 'gets'], r'^(?P<keys>\S{1,250}(?:\s\S{1,250})*)$', format_values),
     (['delete'], r'^(?P<key>\S{1,250})(?: (?P<time>\d+))?(?: (?P<noreply>noreply))?$', DELETED),
     (['incr', 'decr'], r'^(?P<key>\S{1,250}) (?P<value>\d+)(?: (?P<noreply>noreply))?$', None),
     (['flush_all'], r'^(?P<delay>\d+)?$', OK),
 )
 
-def make_memcache_server(store):
-    def attempt_command(command, sfr):
+class MemcacheServer(object):
+    def __init__(self, store):
+        self.store = store
+
+    def __call__(self, sock, addr):
+        iofile = sock.makefile('rw')
+        try:
+            self.handle_connection(iofile, iofile)
+        finally:
+            iofile.close()
+            sock.close()
+
+    def attempt_command(self, command, sfr):
         cmd, _, args = command.partition(' ')
         try:
             rule, func, cb = SUPPORTED_CMDS[cmd]
@@ -53,7 +64,7 @@ def make_memcache_server(store):
         kwargs = match.groupdict()
         noreply = kwargs.pop('noreply', None) == 'noreply'
         try:
-            func = func(store)
+            func = func(self.store)
         except AttributeError, e:
             # not supported
             resp = ERROR
@@ -80,29 +91,18 @@ def make_memcache_server(store):
 
         return '' if noreply else '%s\r\n' % resp
 
-    def handle_connection(sock, addr):
-        try:
-            sfr = sock.makefile('rb')
-            sfw = sock.makefile('wb')
-            try:
-                while True:
-                    command = sfr.readline().rstrip()
-                    if not command:
-                        break
-                    if command == 'quit':
-                        break
-                    response = attempt_command(command, sfr)
-                    if response:
-                        sfw.write(response)
-                        sfw.flush()
-            finally:
-                sfr.close()
-                sfw.close()
-                sock.close()
-        except Exception, e:
-            print 'ERROR', e
+    def handle_connection(self, ifile, ofile):
+        while True:
+            command = ifile.readline().rstrip()
+            if not command:
+                break
+            if command == 'quit':
+                break
+            response = self.attempt_command(command, ifile)
+            if response:
+                ofile.write(response)
+                ofile.flush()
 
-    return handle_connection
 
 if __name__ == '__main__':
     import eventlet
