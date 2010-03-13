@@ -1,3 +1,4 @@
+from StringIO import StringIO
 import eventlet
 from shoveserver import server
 from shoveserver import stores
@@ -47,6 +48,20 @@ tests = [
     [('set testkey 0 0 1\r\n0\r\n\r', 'STORED\r\n'),
         ('decr testkey 1\r\n', '0\r\n'),
         ('get testkey\r\n', 'VALUE testkey 0 1\r\n0\r\nEND\r\n'),],
+    # appending...
+    [('set testkey 0 0 3\r\nfoo\r\n', 'STORED\r\n'),
+        ('append testkey 0 0 3\r\nbar\r\n', 'STORED\r\n'),
+        ('get testkey\r\n', 'VALUE testkey 0 6\r\nfoobar\r\nEND\r\n'),],
+    # prepending...
+    [('set testkey 0 0 3\r\nfoo\r\n', 'STORED\r\n'),
+        ('prepend testkey 0 0 3\r\nbar\r\n', 'STORED\r\n'),
+        ('get testkey\r\n', 'VALUE testkey 0 6\r\nbarfoo\r\nEND\r\n'),],
+    # append to a non-existant key
+    [('append testkey 0 0 2\r\nla\r\n', 'STORED\r\n'),
+        ('get testkey\r\n', 'VALUE testkey 0 2\r\nla\r\nEND\r\n'),],
+    # prepend to a non-existant key
+    [('prepend testkey 0 0 2\r\nla\r\n', 'STORED\r\n'),
+        ('get testkey\r\n', 'VALUE testkey 0 2\r\nla\r\nEND\r\n'),],
 ]
 
 def test_generator():
@@ -54,7 +69,6 @@ def test_generator():
         yield docheck, test
 
 def docheck(commands):
-    from StringIO import StringIO
     store = stores.DictStore({})
     serverfunc = server.MemcacheServer(store)
     for request, response in commands:
