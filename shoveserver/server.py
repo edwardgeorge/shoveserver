@@ -3,11 +3,12 @@ import re
 
 from shoveserver import exceptions
 
+
 def compile(*commands):
     a = lambda exp: re.compile(exp).search
     b = lambda key: operator.attrgetter(key)
     c = lambda i, j, k: (a(j), b(i), k)
-    d = ((key, c(key, j, k)) for i,j,k in commands for key in i)
+    d = ((key, c(key, j, k)) for i, j, k in commands for key in i)
     return dict(d)
 
 ERROR = 'ERROR'
@@ -23,20 +24,27 @@ OK = 'OK'
 VALUE_FORMAT = 'VALUE %(key)s %(flags)d %(length)d\r\n%(data)s\r\n'
 VALUE_END = 'END'
 
+
 def format_values(values):
     data = map(lambda d: VALUE_FORMAT % d, values)
     return '%s%s' % (
         ''.join(data),
-        VALUE_END
-    )
+        VALUE_END)
 
 SUPPORTED_CMDS = compile(
-    (['set', 'replace', 'append', 'prepend', 'add'], r'^(?P<key>\S{1,250}) (?P<flags>\d+) (?P<exptime>\d+) (?P<bytes>\d+)(?: (?P<noreply>noreply))?$', STORED),
+    (['set', 'replace', 'append', 'prepend', 'add'],
+        r'^(?P<key>\S{1,250}) (?P<flags>\d+) (?P<exptime>\d+)'
+        ' (?P<bytes>\d+)(?: (?P<noreply>noreply))?$', STORED),
     (['get', 'gets'], r'^(?P<keys>\S{1,250}(?:\s\S{1,250})*)$', format_values),
-    (['delete'], r'^(?P<key>\S{1,250})(?: (?P<time>\d+))?(?: (?P<noreply>noreply))?$', DELETED),
-    (['incr', 'decr'], r'^(?P<key>\S{1,250}) (?P<value>\d+)(?: (?P<noreply>noreply))?$', None),
+    (['delete'],
+        r'^(?P<key>\S{1,250})(?: (?P<time>\d+))?(?: (?P<noreply>noreply))?$',
+        DELETED),
+    (['incr', 'decr'],
+        r'^(?P<key>\S{1,250}) (?P<value>\d+)(?: (?P<noreply>noreply))?$',
+        None),
     (['flush_all'], r'^(?P<delay>\d+)?$', OK),
 )
+
 
 class MemcacheServer(object):
     def __init__(self, store):
@@ -113,12 +121,14 @@ if __name__ == '__main__':
     import eventlet
     from shoveserver import stores
     store = {}
+
     def statdump(store):
         from datetime import datetime
         while 1:
             print '%s keys: %d' % (datetime.now().isoformat(' '),
                 len(store.keys()))
             eventlet.sleep(10)
+
     eventlet.spawn(statdump, store)
     serve_store(stores.DictStore(store), ('0.0.0.0', 11211))
 

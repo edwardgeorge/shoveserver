@@ -7,12 +7,14 @@ import uuid
 import eventlet
 from shoveserver import exceptions
 
-TS_HORIZON = 2592000 # 30 days into the future
+TS_HORIZON = 2592000  # 30 days into the future
+
 
 def consumedata(file, bytes):
     data = file.read(bytes)
     assert file.read(2) == '\r\n', 'error parsing data'
     return data
+
 
 class DictStore(object):
     def __init__(self, store, flagsupport=True, expirysupport=True):
@@ -46,11 +48,10 @@ class DictStore(object):
         return [{'key': key,
                  'flags': flags,
                  'length': len(data),
-                 'data': data
-                } for key, flags, data in data]
+                 'data': data} for key, flags, data in data]
 
     gets = get
-        
+
     def set(self, file, key, flags, exptime, bytes,
                 replace=False, prepend=False, append=False, add=False):
         data = consumedata(file, int(bytes))
@@ -64,7 +65,7 @@ class DictStore(object):
             data = '%s%s' % (self.store.get(key, ''), data)
         data = self.package(key, data, flags, exptime)
         self.store[key] = data
-    
+
     def delete(self, file, key, time=None):
         try:
             del self.store[key]
@@ -114,7 +115,7 @@ class DictStore(object):
             eventlet.spawn_after(delay, self.store.clear)
         else:
             self.store.clear()
-            
+
 
 class MCEmulationStore(DictStore):
     dataheader = struct.Struct('!Li')
@@ -135,7 +136,7 @@ class MCEmulationStore(DictStore):
         exptime, flags = self.dataheader.unpack(data[:hsize])
         unique, data = data[:8], data[8:]
         return flags, exptime, data[hsize:]
-        
+
     def checkexpiry(self, exptime):
         return exptime == 0 or exptime > time.time()
 
