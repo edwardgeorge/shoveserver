@@ -11,8 +11,8 @@ def compile(*commands):
     return dict(d)
 
 ERROR = 'ERROR'
-SERVER_ERROR = 'SERVER_ERROR %s'
-CLIENT_ERROR = 'CLIENT_ERROR %s'
+SERVER_ERROR = 'SERVER_ERROR %s\r\n'
+CLIENT_ERROR = 'CLIENT_ERROR %s\r\n'
 
 STORED = 'STORED'
 NOT_FOUND = 'NOT_FOUND'

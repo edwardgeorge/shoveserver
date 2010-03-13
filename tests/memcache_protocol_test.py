@@ -35,6 +35,12 @@ tests = [
         ('get testkey\r\n', 'VALUE testkey 0 1\r\n7\r\nEND\r\n'),],
     # increment non-existing key
     [('incr testkey 1\r\n', 'NOT_FOUND\r\n'),],
+    # increment a non-integer value
+    [('set testkey 0 0 3\r\nfoo\r\n\r', 'STORED\r\n'),
+        ('incr testkey 4\r\n', '4\r\n'),],
+    # increment with a non-integer value
+    [('set testkey 0 0 1\r\n4\r\n\r', 'STORED\r\n'),
+        ('incr testkey bah\r\n', 'CLIENT_ERROR invalid args\r\n'),],
     # decrementing...
     [('set testkey 0 0 1\r\n5\r\n\r', 'STORED\r\n'),
         ('decr testkey 1\r\n', '4\r\n'),
@@ -48,6 +54,12 @@ tests = [
     [('set testkey 0 0 1\r\n0\r\n\r', 'STORED\r\n'),
         ('decr testkey 1\r\n', '0\r\n'),
         ('get testkey\r\n', 'VALUE testkey 0 1\r\n0\r\nEND\r\n'),],
+    # decrement a non-integer value
+    [('set testkey 0 0 3\r\nfoo\r\n\r', 'STORED\r\n'),
+        ('decr testkey 4\r\n', '0\r\n'),],
+    # decrement with a non-integer value
+    [('set testkey 0 0 1\r\n4\r\n\r', 'STORED\r\n'),
+        ('decr testkey bah\r\n', 'CLIENT_ERROR invalid args\r\n'),],
     # appending...
     [('set testkey 0 0 3\r\nfoo\r\n', 'STORED\r\n'),
         ('append testkey 0 0 3\r\nbar\r\n', 'STORED\r\n'),
