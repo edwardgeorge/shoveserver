@@ -40,6 +40,15 @@ class TaggingStore(shoveserver.stores.Store):
                 del self.store[key]
                 self.key_tags[key].remove(tag)
 
+    def delete(self, file, key, *args, **kwargs):
+        super(TaggingStore, self).delete(file, key, *args, **kwargs)
+        tags = self.key_tags.pop(key, [])
+        for tag in tags:
+            tagkeys = self.tags[tag]
+            tagkeys.remove(key)
+            if not tagkeys:
+                del self.tags[tag]
+
 
 def taggingserver(store):
     server = shoveserver.server.MemcacheServer(store)

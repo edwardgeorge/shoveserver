@@ -79,3 +79,21 @@ def test_adding_tag_to_nonexistant_key():
     resp = server_request(server, 'tag_add testtag testkey\r\n')
     assert resp == 'TAG_NOT_FOUND\r\n', resp
 
+def test_deleting_key_with_associated_tag():
+    data = {}
+    store = taggingcache.TaggingStore(data, writeable=True)
+    server = taggingcache.taggingserver(store)
+
+    resp = server_request(server, 'set testkey 0 0 4\r\n'
+                                  'blah\r\n')
+    assert resp == 'STORED\r\n'
+
+    resp = server_request(server, 'tag_add testtag testkey\r\n')
+    assert resp == 'TAG_STORED\r\n'
+
+    resp = server_request(server, 'delete testkey\r\n')
+    assert resp == 'DELETED\r\n', resp
+
+    assert 'testkey' not in store.key_tags
+    assert 'testtag' not in store.tags
+
