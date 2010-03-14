@@ -39,6 +39,9 @@ class MemcacheServer(object):
     def __init__(self, store):
         self.store = store
         self.commands = SUPPORTED_CMDS.copy()
+        if hasattr(store, 'EXTRA_CMDS'):
+            for cmd in store.EXTRA_CMDS:
+                self.add_command(*cmd)
 
     def __call__(self, sock, addr):
         iofile = sock.makefile('rw')

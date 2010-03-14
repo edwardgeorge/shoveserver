@@ -19,6 +19,10 @@ class TagNotFoundError(exceptions.MemcacheProtocolException):
 
 
 class TaggingStore(shoveserver.stores.Store):
+    EXTRA_CMDS = [
+      (['tag_add'], r'^(?P<tag>\S{1,250})\s(?P<key>\S{1,250})$', TAG_STORED),
+      (['tag_delete'], r'^(?P<tag>\S{1,250})$', TAG_DELETED), ]
+
     def __init__(self, *args, **kwargs):
         super(TaggingStore, self).__init__(*args, **kwargs)
         self.tags = {}
@@ -52,10 +56,6 @@ class TaggingStore(shoveserver.stores.Store):
 
 def taggingserver(store):
     server = shoveserver.server.MemcacheServer(store)
-    server.add_command(['tag_add'],
-        r'^(?P<tag>\S{1,250})\s(?P<key>\S{1,250})$', TAG_STORED)
-    server.add_command(['tag_delete'],
-        r'^(?P<tag>\S{1,250})$', TAG_DELETED)
     return server
 
 
