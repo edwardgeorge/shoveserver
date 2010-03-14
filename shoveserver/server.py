@@ -3,6 +3,7 @@ import re
 
 import eventlet
 from shoveserver import exceptions
+from shoveserver.protocol_strings import *
 
 
 def compile(*commands):
@@ -11,19 +12,6 @@ def compile(*commands):
     c = lambda i, j, k: (a(j), b(i), k)
     d = ((key, c(key, j, k)) for i, j, k in commands for key in i)
     return dict(d)
-
-ERROR = 'ERROR'
-SERVER_ERROR = 'SERVER_ERROR %s'
-CLIENT_ERROR = 'CLIENT_ERROR %s'
-
-STORED = 'STORED'
-NOT_FOUND = 'NOT_FOUND'
-NOT_STORED = 'NOT_STORED'
-DELETED = 'DELETED'
-OK = 'OK'
-
-VALUE_FORMAT = 'VALUE %(key)s %(flags)d %(length)d\r\n%(data)s\r\n'
-VALUE_END = 'END'
 
 
 def format_values(values):
@@ -98,12 +86,8 @@ class MemcacheServer(object):
 
         except AssertionError, e:
             resp = CLIENT_ERROR % e
-        except exceptions.NotFoundError, e:
-            resp = NOT_FOUND
-        except exceptions.NotStoredError, e:
-            resp = NOT_STORED
-        except exceptions.UnsupportedCommandError, e:
-            resp = ERROR
+        except exceptions.MemcacheProtocolException, e:
+            resp = e.response
         except Exception, e:
             print 'error', e
             resp = SERVER_ERROR % 'unhandled exception'
