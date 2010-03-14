@@ -3,7 +3,7 @@ import eventlet
 from shoveserver import server
 from shoveserver import stores
 
-tests = [
+dict_tests = [
     # get a single non-existant key
     [('get testkey\r\n', 'END\r\n'),],
     # get multiple non-existant ket
@@ -104,7 +104,7 @@ readonly_tests = [
     # readonly tests
     [('set testkey 0 0 4\r\nblah\r\n', 'ERROR\r\n'),],
     [('replace testkey 0 0 4\r\nblah\r\n', 'ERROR\r\n'),],
-    [('add testkey 0 0 4\r\nblah\r\n', 'ERROR\r\n'),],
+    [('add testkey1 0 0 4\r\nblah\r\n', 'ERROR\r\n'),],
     [('prepend testkey 0 0 4\r\nblah\r\n', 'ERROR\r\n'),],
     [('append testkey 0 0 4\r\nblah\r\n', 'ERROR\r\n'),],
     [('delete testkey\r\n', 'ERROR\r\n'),],
@@ -112,14 +112,18 @@ readonly_tests = [
     [('decr testkey 4\r\n', 'ERROR\r\n'),],
 ]
 
-def test_generator():
-    for test in tests:
-        yield docheck, test
-    for test in readonly_tests:
-        yield docheck, test, {'readonly': True}
+tests = [
+    (dict_tests, stores.DictStore, {}, {}),
+    (readonly_tests, stores.DictStore, {'testkey': 'testdata'}, {'readonly': True}),
+]
 
-def docheck(commands, storeargs={}):
-    store = stores.DictStore({}, **storeargs)
+def test_generator():
+    for testspecs, storeclass, initdata, args in tests:
+        for test in testspecs:
+            yield docheck, test, storeclass, initdata, args
+
+def docheck(commands, storeclass=stores.DictStore, initialdata={}, storeargs={}):
+    store = storeclass(initialdata.copy(), **storeargs)
     serverfunc = server.MemcacheServer(store)
     for request, response in commands:
         request = StringIO(request)
