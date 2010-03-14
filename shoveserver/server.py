@@ -11,7 +11,7 @@ def compile(*commands):
     d = ((key, c(key, j, k)) for i, j, k in commands for key in i)
     return dict(d)
 
-ERROR = 'ERROR'
+ERROR = 'ERROR\r\n'
 SERVER_ERROR = 'SERVER_ERROR %s\r\n'
 CLIENT_ERROR = 'CLIENT_ERROR %s\r\n'
 

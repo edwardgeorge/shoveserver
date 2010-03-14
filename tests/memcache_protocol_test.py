@@ -85,6 +85,8 @@ tests = [
         ('get testkey\r\n', 'VALUE testkey 0 3\r\nfoo\r\nEND\r\n'),],
     # replacing a non-existant value
     [('replace testkey 0 0 3\r\nfoo\r\n', 'NOT_STORED\r\n'),],
+    # non-existant command
+    [('yoink testkey\r\n', 'ERROR\r\n'),],
 ]
 
 def test_generator():
