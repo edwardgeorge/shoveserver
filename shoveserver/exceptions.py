@@ -5,3 +5,7 @@ class NotFoundError(Exception):
 class NotStoredError(Exception):
     pass
 
+
+class UnsupportedCommandError(Exception):
+    pass
+

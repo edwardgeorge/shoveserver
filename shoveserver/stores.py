@@ -17,8 +17,11 @@ def consumedata(file, bytes):
 
 
 class DictStore(object):
-    def __init__(self, store, flagsupport=True, expirysupport=True):
+    def __init__(self, store, readonly=False,
+                              flagsupport=True,
+                              expirysupport=True):
         self.store = store
+        self.readonly = readonly
         self.flagsupport = flagsupport
         self.expirysupport = expirysupport
 
@@ -55,6 +58,8 @@ class DictStore(object):
     def set(self, file, key, flags, exptime, bytes,
                 replace=False, prepend=False, append=False, add=False):
         data = consumedata(file, int(bytes))
+        if self.readonly:
+            raise exceptions.UnsupportedCommandError()
         if replace and key not in self.store:
             raise exceptions.NotStoredError(key)
         if add and key in self.store:
@@ -67,6 +72,8 @@ class DictStore(object):
         self.store[key] = data
 
     def delete(self, file, key, time=None):
+        if self.readonly:
+            raise exceptions.UnsupportedCommandError()
         try:
             del self.store[key]
         except KeyError, e:
@@ -86,6 +93,8 @@ class DictStore(object):
         return self.set(file, key, flags, exptime, bytes, prepend=True)
 
     def incr(self, file, key, value):
+        if self.readonly:
+            raise exceptions.UnsupportedCommandError()
         assert value.isdigit(), 'value must be an integer'
         value = int(value)
         try:
@@ -98,6 +107,8 @@ class DictStore(object):
         return val
 
     def decr(self, file, key, value):
+        if self.readonly:
+            raise exceptions.UnsupportedCommandError()
         assert value.isdigit(), 'value must be an integer'
         value = int(value)
         try:
@@ -110,6 +121,8 @@ class DictStore(object):
         return val
 
     def flush_all(self, file, delay=0):
+        if self.readonly:
+            raise exceptions.UnsupportedCommandError()
         delay = int(delay)
         if delay > 0:
             eventlet.spawn_after(delay, self.store.clear)

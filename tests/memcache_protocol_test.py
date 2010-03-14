@@ -100,12 +100,26 @@ tests = [
         ('decr testkey 4 noreply\r\n', ''),],
 ]
 
+readonly_tests = [
+    # readonly tests
+    [('set testkey 0 0 4\r\nblah\r\n', 'ERROR\r\n'),],
+    [('replace testkey 0 0 4\r\nblah\r\n', 'ERROR\r\n'),],
+    [('add testkey 0 0 4\r\nblah\r\n', 'ERROR\r\n'),],
+    [('prepend testkey 0 0 4\r\nblah\r\n', 'ERROR\r\n'),],
+    [('append testkey 0 0 4\r\nblah\r\n', 'ERROR\r\n'),],
+    [('delete testkey\r\n', 'ERROR\r\n'),],
+    [('incr testkey 4\r\n', 'ERROR\r\n'),],
+    [('decr testkey 4\r\n', 'ERROR\r\n'),],
+]
+
 def test_generator():
     for test in tests:
         yield docheck, test
+    for test in readonly_tests:
+        yield docheck, test, {'readonly': True}
 
-def docheck(commands):
-    store = stores.DictStore({})
+def docheck(commands, storeargs={}):
+    store = stores.DictStore({}, **storeargs)
     serverfunc = server.MemcacheServer(store)
     for request, response in commands:
         request = StringIO(request)

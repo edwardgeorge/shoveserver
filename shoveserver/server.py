@@ -11,9 +11,9 @@ def compile(*commands):
     d = ((key, c(key, j, k)) for i, j, k in commands for key in i)
     return dict(d)
 
-ERROR = 'ERROR\r\n'
-SERVER_ERROR = 'SERVER_ERROR %s\r\n'
-CLIENT_ERROR = 'CLIENT_ERROR %s\r\n'
+ERROR = 'ERROR'
+SERVER_ERROR = 'SERVER_ERROR %s'
+CLIENT_ERROR = 'CLIENT_ERROR %s'
 
 STORED = 'STORED'
 NOT_FOUND = 'NOT_FOUND'
@@ -63,11 +63,11 @@ class MemcacheServer(object):
         try:
             rule, func, cb = SUPPORTED_CMDS[cmd]
         except KeyError, e:
-            return ERROR
+            return '%s\r\n' % ERROR
 
         match = rule(args)
         if not match:
-            return CLIENT_ERROR % 'invalid args'
+            return '%s\r\n' % (CLIENT_ERROR % 'invalid args')
 
         kwargs = match.groupdict()
         noreply = kwargs.pop('noreply', None) == 'noreply'
@@ -93,6 +93,8 @@ class MemcacheServer(object):
             resp = NOT_FOUND
         except exceptions.NotStoredError, e:
             resp = NOT_STORED
+        except exceptions.UnsupportedCommandError, e:
+            resp = ERROR
         except Exception, e:
             print 'error', e
             resp = SERVER_ERROR % 'unhandled exception'
