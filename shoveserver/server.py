@@ -50,6 +50,7 @@ SUPPORTED_CMDS = compile(
 class MemcacheServer(object):
     def __init__(self, store):
         self.store = store
+        self.commands = SUPPORTED_CMDS.copy()
 
     def __call__(self, sock, addr):
         iofile = sock.makefile('rw')
@@ -59,10 +60,16 @@ class MemcacheServer(object):
             iofile.close()
             sock.close()
 
+    def add_command(self, commands, regexp, response):
+        if isinstance(commands, basestring):
+            commands = [commands]
+        newcmds = compile((commands, regexp, response))
+        self.commands.update(newcmds)
+
     def attempt_command(self, command, sfr):
         cmd, _, args = command.partition(' ')
         try:
-            rule, func, cb = SUPPORTED_CMDS[cmd]
+            rule, func, cb = self.commands[cmd]
         except KeyError, e:
             return '%s\r\n' % ERROR
 
