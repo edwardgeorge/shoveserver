@@ -87,6 +87,17 @@ tests = [
     [('replace testkey 0 0 3\r\nfoo\r\n', 'NOT_STORED\r\n'),],
     # non-existant command
     [('yoink testkey\r\n', 'ERROR\r\n'),],
+    # noreply tests
+    [('set testkey 0 0 4 noreply\r\nblah\r\n', ''),],
+    [('delete testkey noreply\r\n', ''),],
+    [('set testkey 0 0 4\r\nblah\r\n', 'STORED\r\n'),
+        ('delete testkey noreply\r\n', ''),],
+    [('incr testkey 4 noreply\r\n', ''),],
+    [('decr testkey 4 noreply\r\n', ''),],
+    [('set testkey 0 0 1\r\n2\r\n', 'STORED\r\n'),
+        ('incr testkey 4 noreply\r\n', ''),],
+    [('set testkey 0 0 1\r\n2\r\n', 'STORED\r\n'),
+        ('decr testkey 4 noreply\r\n', ''),],
 ]
 
 def test_generator():
