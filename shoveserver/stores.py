@@ -68,6 +68,9 @@ class DictStore(object):
             data = '%s%s' % (data, self.store.get(key, ''))
         if append:
             data = '%s%s' % (self.store.get(key, ''), data)
+        self._set(key, data, flags, exptime)
+
+    def _set(self, key, data, flags, exptime):
         data = self.package(key, data, flags, exptime)
         self.store[key] = data
 
