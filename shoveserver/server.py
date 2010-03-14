@@ -127,5 +127,5 @@ if __name__ == '__main__':
             eventlet.sleep(10)
 
     eventlet.spawn(statdump, store)
-    serve_store(stores.DictStore(store), ('0.0.0.0', 11211))
+    serve_store(stores.Store(store), ('0.0.0.0', 11211))
 

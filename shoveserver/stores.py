@@ -7,6 +7,8 @@ import uuid
 import eventlet
 from shoveserver import exceptions
 
+__all__ = ['BaseStore', 'Store']
+
 TS_HORIZON = 2592000  # 30 days into the future
 
 
@@ -16,7 +18,7 @@ def consumedata(file, bytes):
     return data
 
 
-class DictStore(object):
+class BaseStore(object):
     def __init__(self, store, writeable=False,
                               flagsupport=True,
                               expirysupport=True):
@@ -133,27 +135,6 @@ class DictStore(object):
             self.store.clear()
 
 
-class MCEmulationStore(DictStore):
-    dataheader = struct.Struct('!Li')
-
-    def package(self, key, data, flags, exptime):
-        exptime = int(exptime)
-        flags = int(flags)
-        if 0 < exptime <= TS_HORIZON:
-            # if less than ts_horizon consider relative
-            exptime = int(time.time()) + exptime
-        header = self.dataheader.pack(exptime, flags)
-        unique = uuid.uuid1().bytes
-        unique = hashlib.sha1(unique).digest()[-8:]
-        return '%s%s%s' % (header, unique, data)
-
-    def unpackage(self, key, data):
-        hsize = self.dataheader.size
-        exptime, flags = self.dataheader.unpack(data[:hsize])
-        unique, data = data[:8], data[8:]
-        return flags, exptime, data[hsize:]
-
-    def checkexpiry(self, exptime):
-        return exptime == 0 or exptime > time.time()
-
+class Store(BaseStore):
+    pass
 

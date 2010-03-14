@@ -114,8 +114,8 @@ readonly_tests = [
 ]
 
 tests = [
-    (dict_tests, stores.DictStore, {}, {'writeable': True}),
-    (readonly_tests, stores.DictStore, {'testkey': 'testdata'}, {}),
+    (dict_tests, stores.Store, {}, {'writeable': True}),
+    (readonly_tests, stores.Store, {'testkey': 'testdata'}, {}),
 ]
 
 
@@ -125,7 +125,7 @@ def test_generator():
             yield docheck, test, storeclass, initdata, args
 
 
-def docheck(commands, storeclass=stores.DictStore,
+def docheck(commands, storeclass=stores.Store,
                       initialdata={},
                       storeargs={}):
     store = storeclass(initialdata.copy(), **storeargs)
