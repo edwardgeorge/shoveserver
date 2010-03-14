@@ -1,7 +1,8 @@
-from StringIO import StringIO
 import eventlet
 from shoveserver import server
 from shoveserver import stores
+
+from tests import server_request
 
 dict_tests = [
     # get a single non-existant key
@@ -131,9 +132,6 @@ def docheck(commands, storeclass=stores.Store,
     store = storeclass(initialdata.copy(), **storeargs)
     serverfunc = server.MemcacheServer(store)
     for request, response in commands:
-        request = StringIO(request)
-        respio = StringIO()
-        serverfunc.handle_connection(request, respio)
-        data = respio.getvalue()
+        data = server_request(serverfunc, request)
         assert data == response, '%r != expected %r' % (data, response)
 
