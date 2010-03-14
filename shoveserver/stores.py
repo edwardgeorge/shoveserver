@@ -17,11 +17,11 @@ def consumedata(file, bytes):
 
 
 class DictStore(object):
-    def __init__(self, store, readonly=False,
+    def __init__(self, store, writeable=False,
                               flagsupport=True,
                               expirysupport=True):
         self.store = store
-        self.readonly = readonly
+        self.readonly = not writeable
         self.flagsupport = flagsupport
         self.expirysupport = expirysupport
 

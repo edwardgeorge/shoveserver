@@ -114,9 +114,8 @@ readonly_tests = [
 ]
 
 tests = [
-    (dict_tests, stores.DictStore, {}, {}),
-    (readonly_tests, stores.DictStore, {'testkey': 'testdata'},
-                                       {'readonly': True}),
+    (dict_tests, stores.DictStore, {}, {'writeable': True}),
+    (readonly_tests, stores.DictStore, {'testkey': 'testdata'}, {}),
 ]
 
 
