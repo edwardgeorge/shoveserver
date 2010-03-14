@@ -59,7 +59,6 @@ class MemcacheServer(object):
         try:
             rule, func, cb = self.commands[cmd]
         except KeyError, e:
-            print 'command %s not found in %s' % (cmd, ', '.join(self.commands))
             return '%s\r\n' % ERROR
 
         match = rule(args)
