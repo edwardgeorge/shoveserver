@@ -19,13 +19,9 @@ def consumedata(file, bytes):
 
 
 class BaseStore(object):
-    def __init__(self, store, writeable=False,
-                              flagsupport=True,
-                              expirysupport=True):
+    def __init__(self, store, writeable=False):
         self.store = store
         self.readonly = not writeable
-        self.flagsupport = flagsupport
-        self.expirysupport = expirysupport
 
     def unpackage(self, key, data):
         return 0, 0, data
