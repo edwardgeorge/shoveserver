@@ -1,6 +1,7 @@
 import operator
 import re
 
+import eventlet
 from shoveserver import exceptions
 
 
@@ -114,7 +115,7 @@ class MemcacheServer(object):
                 ofile.flush()
 
 
-def serve_store(store, sock):
+def serve_store(sock, store):
     if isinstance(sock, tuple):
         sock = eventlet.listen(sock)
     eventlet.serve(sock, MemcacheServer(store))
