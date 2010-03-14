@@ -71,6 +71,7 @@ class MemcacheServer(object):
         try:
             rule, func, cb = self.commands[cmd]
         except KeyError, e:
+            print 'command %s not found in %s' % (cmd, ', '.join(self.commands))
             return '%s\r\n' % ERROR
 
         match = rule(args)
@@ -122,10 +123,12 @@ class MemcacheServer(object):
                 ofile.flush()
 
 
-def serve_store(sock, store):
+def serve_store(sock, store, server=None):
     if isinstance(sock, tuple):
         sock = eventlet.listen(sock)
-    eventlet.serve(sock, MemcacheServer(store))
+    if not server:
+        server = MemcacheServer(store)
+    eventlet.serve(sock, server)
 
 if __name__ == '__main__':
     import eventlet
