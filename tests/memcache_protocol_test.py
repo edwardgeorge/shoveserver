@@ -134,4 +134,3 @@ def docheck(commands, storeclass=stores.Store,
     for request, response in commands:
         data = server_request(serverfunc, request)
         assert data == response, '%r != expected %r' % (data, response)
-

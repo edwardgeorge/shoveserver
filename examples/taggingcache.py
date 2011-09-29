@@ -68,4 +68,3 @@ def serve(d, host='127.0.0.1', port=11211):
 
 if __name__ == '__main__':
     serve({})
-
