@@ -133,4 +133,3 @@ class BaseStore(object):
 
 class Store(BaseStore):
     pass
-

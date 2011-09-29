@@ -10,4 +10,3 @@ OK = 'OK'
 
 VALUE_FORMAT = 'VALUE %(key)s %(flags)d %(length)d\r\n%(data)s\r\n'
 VALUE_END = 'END'
-

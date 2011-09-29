@@ -8,4 +8,3 @@ def spawn_server(addr, store, **kwargs):
         store = stores.Store(store, **kwargs)
     sock = eventlet.listen(addr)
     eventlet.spawn(server.serve_store, sock, store)
-
