@@ -1,0 +1,18 @@
+shoveserver
+
+Exposes a dictionary-like object via a subset of the memcached protocol.
+
+
+import shoveserver
+somedata = {}
+shoveserver.spawn_server(('127.0.0.1', 11211), somedata)
+...spawns a new eventlet greenthread and you can go about your business
+
+NOTE:
+
+Despite supporting some write operations the intention is not to produce a
+memcached drop-in replacement or for it to be run as a memcached-like server.
+
+However it may have uses within a development environment running as an
+easily customiseable memcached-like server.
+
